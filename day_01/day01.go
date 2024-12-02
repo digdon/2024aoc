@@ -21,23 +21,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	part1(inputLines)
-	part2(inputLines)
-}
-
-func part1(inputLines []string) {
-	left, right := []int{}, []int{}
+	left, right, rightMap := []int{}, []int{}, map[int]int{}
 
 	for _, line := range inputLines {
 		var x, y int
 		fmt.Sscanf(line, "%d %d", &x, &y)
 		left = append(left, x)
 		right = append(right, y)
+		rightMap[y]++
 	}
 
 	sort.Ints(left)
 	sort.Ints(right)
 
+	// Part 1
 	var diffs int
 
 	for i := 0; i < len(left); i++ {
@@ -51,20 +48,9 @@ func part1(inputLines []string) {
 	}
 
 	fmt.Println("Part 1:", diffs)
-}
 
-func part2(inputLines []string) {
-	left := []int{}
-	rightMap := map[int]int{}
-
-	for _, line := range inputLines {
-		var x, y int
-		fmt.Sscanf(line, "%d %d", &x, &y)
-		left = append(left, x)
-		rightMap[y]++
-	}
-
-	score := 0
+	// Part 2
+	var score int
 
 	for _, x := range left {
 		score += x * rightMap[x]
