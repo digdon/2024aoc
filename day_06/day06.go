@@ -85,6 +85,7 @@ func part2(grid [][]byte, startX, startY, startDir int, possible []Point) int {
 		visited := map[Path]bool{}
 		loopFound := false
 		x, y, dir := startX, startY, startDir
+		checkVisited := false
 
 		// Move the guard
 		for {
@@ -95,8 +96,9 @@ func part2(grid [][]byte, startX, startY, startDir int, possible []Point) int {
 
 			position := Path{Point{x, y}, dir}
 
-			if visited[position] {
-				// Hit this spot, in this direction, already once, so we must be in a loop
+			// Check for looping. However, we only need to start checking after we've reached the obstacle we placed
+			if checkVisited && visited[position] {
+				// We've reached this spot, in this direction, already once, so we must be in a loop
 				loopFound = true
 				break
 			}
@@ -106,6 +108,11 @@ func part2(grid [][]byte, startX, startY, startDir int, possible []Point) int {
 			if tempY >= 0 && tempY < len(grid) && tempX >= 0 && tempX < len(grid[tempY]) && grid[tempY][tempX] == '#' {
 				// Obstacle - turn right
 				dir = (dir + 1) % 4
+
+				if !checkVisited && tempX == point.x && tempY == point.y {
+					// We've reached the obstacle we placed, so now we can enable the check for looping
+					checkVisited = true
+				}
 			} else {
 				// Move forward
 				x, y = tempX, tempY
