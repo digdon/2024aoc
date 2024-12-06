@@ -29,16 +29,7 @@ func main() {
 			char := inputLines[y][x]
 			if char != '.' && char != '#' {
 				startX, startY = x, y
-				switch char {
-				case '>':
-					startDir = RIGHT
-				case 'v':
-					startDir = DOWN
-				case '<':
-					startDir = LEFT
-				default:
-					startDir = UP
-				}
+				startDir = charToDirMap[char]
 				guardFound = true
 				break
 			}
@@ -145,6 +136,13 @@ type Path struct {
 
 type Point struct {
 	x, y int
+}
+
+var charToDirMap = map[byte]int{
+	'^': UP,
+	'>': RIGHT,
+	'v': DOWN,
+	'<': LEFT,
 }
 
 const (
