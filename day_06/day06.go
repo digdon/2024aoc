@@ -22,9 +22,8 @@ func main() {
 
 	// Start by finding guard
 	var startX, startY, startDir int
-	guardFound := false
 
-	for y := 0; y < len(inputLines); y++ {
+	for y, guardFound := 0, false; y < len(inputLines) && !guardFound; y++ {
 		for x := 0; x < len(inputLines[y]); x++ {
 			char := inputLines[y][x]
 			if char != '.' && char != '#' {
@@ -33,10 +32,6 @@ func main() {
 				guardFound = true
 				break
 			}
-		}
-
-		if guardFound {
-			break
 		}
 	}
 
@@ -79,22 +74,22 @@ func part1Locations(grid [][]byte, x, y, dir int) map[Point]bool {
 func part2(grid [][]byte, startX, startY, startDir int, possible []Point) int {
 	var count int
 
-	// For every point the guard originally reached, add an obstacle and see if we can get the guard to form a loop
+	// For every point the guard originally reached, add an obstacle and see if we can get the guard to form a loop.
 	// We already know that the guard can only reach these particular points if there are no obstacles, so that means
-	// we only need to try putting obstacles along this path
+	// we only need to try putting obstacles along this path.
 	for _, point := range possible {
 		// Set an obstacle at the next point
 		grid[point.y][point.x] = '#'
 
-		// Reset the visited map
+		// Reset everything
 		visited := map[Path]bool{}
-
 		loopFound := false
+		x, y, dir := startX, startY, startDir
 
 		// Move the guard
-		x, y, dir := startX, startY, startDir
 		for {
 			if y < 0 || y >= len(grid) || x < 0 || x >= len(grid[y]) {
+				// Fell off the edge, so no loop found
 				break
 			}
 
@@ -118,7 +113,7 @@ func part2(grid [][]byte, startX, startY, startDir int, possible []Point) int {
 		}
 
 		if loopFound {
-			// fmt.Println("loop created for point", point)
+			// fmt.Println("loop created by obstacle at", point)
 			count++
 		}
 
