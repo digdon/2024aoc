@@ -23,14 +23,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	part1(inputLines)
-	part2(inputLines)
+	begin := time.Now()
+	part1Results := part1(inputLines)
+	part1Time := time.Since(begin)
+
+	begin = time.Now()
+	part2Results := part2(inputLines)
+	part2Time := time.Since(begin)
+
+	fmt.Printf("Part 1: %d (in %s)\n", part1Results, part1Time)
+	fmt.Printf("Part 2: %d (in %s)\n", part2Results, part2Time)
 }
 
-func part1(inputLines []string) {
+func part1(inputLines []string) int {
 	var part1Total int
-
-	begin := time.Now().UnixMilli()
 
 	for _, line := range inputLines {
 		colonIdx := strings.Index(line, ": ")
@@ -61,14 +67,11 @@ func part1(inputLines []string) {
 		}
 	}
 
-	fmt.Println("Part 1:", part1Total)
-	fmt.Println(time.Since(time.UnixMilli(begin)))
+	return part1Total
 }
 
-func part2(inputLines []string) {
+func part2(inputLines []string) int {
 	var part2Total int
-
-	begin := time.Now().UnixMilli()
 
 	for _, line := range inputLines {
 		colonIdx := strings.Index(line, ": ")
@@ -125,8 +128,7 @@ func part2(inputLines []string) {
 		}
 	}
 
-	fmt.Println("Part 2:", part2Total)
-	fmt.Println(time.Since(time.UnixMilli(begin)))
+	return part2Total
 }
 
 func display(targetValue int, values []int, addMul, concat, result int) {
