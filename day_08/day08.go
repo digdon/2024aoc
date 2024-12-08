@@ -38,7 +38,7 @@ func main() {
 	}
 
 	// Now process each group of antennas. Find the (manhattan) distance between each pair of antennas
-	// and then create a pair of antinodes for each pair of antennas
+	// and then create a set of antinodes for each pair of antennas
 	part1NodeMap := map[Point]int{}
 	part2NodeMap := map[Point]int{}
 
@@ -47,11 +47,11 @@ func main() {
 			for j := i + 1; j < len(points); j++ {
 				diffX, diffY := points[i].x-points[j].x, points[i].y-points[j].y
 
-				// Part 1 stuff
+				// Part 1 stuff - we only need 1 antinode in each direction
 				addAntinodes(part1NodeMap, points[i], diffX, diffY, len(grid[0]), len(grid), true)
 				addAntinodes(part1NodeMap, points[j], -diffX, -diffY, len(grid[0]), len(grid), true)
 
-				// Part 2 stuff
+				// Part 2 stuff - multiple antinodes in each direction
 				addAntinodes(part2NodeMap, points[i], diffX, diffY, len(grid[0]), len(grid), false)
 				addAntinodes(part2NodeMap, points[j], -diffX, -diffY, len(grid[0]), len(grid), false)
 
