@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func main() {
+func base3() {
 	var inputLines []string
 	scanner := bufio.NewScanner(os.Stdin)
 
