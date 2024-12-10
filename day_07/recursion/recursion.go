@@ -52,7 +52,7 @@ func evaluateEquations(inputLines []string, includeConcat bool) int {
 }
 
 func process(targetValue int, runningTotal int, values []int, includeConcat bool) bool {
-	if runningTotal == targetValue {
+	if runningTotal == targetValue && len(values) == 0 {
 		return true
 	} else if runningTotal > targetValue {
 		return false

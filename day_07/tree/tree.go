@@ -54,7 +54,7 @@ func evaluateEquations(inputLines []string, includeConcat bool) int {
 }
 
 func process(targetValue int, node Node, values []int, includeConcat bool) bool {
-	if node.result == targetValue {
+	if node.result == targetValue && len(values) == 0 {
 		// displayResult(&node, targetValue)
 		return true
 	} else if node.result > targetValue {
