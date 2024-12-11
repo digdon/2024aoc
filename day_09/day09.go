@@ -106,7 +106,7 @@ func defrag(input string, moveFull bool) int {
 
 		// Found a spot to move the non-empty block to
 		if empty.size == full.size {
-			// Blocks are the size size, so just swap contents
+			// Blocks are the same size, so just swap contents
 			empty.id, full.id = full.id, empty.id
 			empty.moved = true
 			full = full.prev
@@ -118,16 +118,14 @@ func defrag(input string, moveFull bool) int {
 			newBlock.next = empty
 			empty.prev = newBlock
 
-			// Update the remaining empty block and mark the non-empty block as now empty
+			// Update the remaining empty block
 			empty.start += moveCount
 			empty.size -= moveCount
 
 			// Adjust the non-empty block, as necessary
-			if !moveFull {
-				full.size -= moveCount
-			}
+			full.size -= moveCount
 
-			if moveFull || full.size == 0 {
+			if full.size == 0 {
 				full.id = -1
 			}
 		}
