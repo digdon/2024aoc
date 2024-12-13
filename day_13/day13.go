@@ -77,7 +77,7 @@ func solveSystem(system System) int {
 		a = -a
 	}
 
-	// Plug 'a into equation one to solve for 'b'
+	// Plug 'a' into equation one to solve for 'b'
 	b := (system.one.result - system.one.a*a) / system.one.b
 
 	if (system.one.result-system.one.a*a)%system.one.b != 0 {

@@ -64,20 +64,6 @@ func main() {
 		}
 	}
 
-	// fmt.Println("--------")
-	// for row := 0; row < len(grid); row++ {
-	// 	for col := 0; col < len(grid[row]); col++ {
-	// 		char := grid[row][col]
-
-	// 		if part2NodeMap[Point{col, row}] > 0 {
-	// 			char = '#'
-	// 		}
-
-	// 		fmt.Printf("%c", char)
-	// 	}
-	// 	fmt.Println()
-	// }
-
 	fmt.Println("Part 1:", len(part1NodeMap))
 	fmt.Println("Part 2:", len(part2NodeMap))
 }
