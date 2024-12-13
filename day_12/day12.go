@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -19,6 +20,8 @@ func main() {
 		log.Println(err)
 		os.Exit(1)
 	}
+
+	begin := time.Now()
 
 	regionMap := map[rune][]Region{}
 	visited := map[Point]bool{}
@@ -85,6 +88,7 @@ func main() {
 
 	fmt.Println("Part 1:", part1Price)
 	fmt.Println("Part 2:", part2Price)
+	fmt.Println(time.Since(begin))
 }
 
 func cornerCount(grid [][]rune, x, y int) int {
