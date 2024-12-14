@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -41,60 +42,51 @@ func main() {
 
 	fmt.Println("Part 1:", safetyFactor)
 
-	// Part 2
+	originalPart2(robots, maxX, maxY)
+	alternatePart2(robots, maxX, maxY)
+}
+
+func originalPart2(robots []Robot, maxX, maxY int) {
+	begin := time.Now()
 	var positions map[Point]int
 	iteration := -1
 
 	for found, i := false, 0; !found && i < 10000; i++ {
 		positions = calcRobotPositions(robots, maxX, maxY, i)
 
-		// // Look for any column that has a bunch of robots in it
-		// columnCounts := map[int]int{}
+		// Look for any column that has a bunch of robots in it
+		columnCounts := map[int]int{}
 
-		// for point := range positions {
-		// 	columnCounts[point.x]++
-		// }
-
-		// for x, count := range columnCounts {
-		// 	if count >= 30 {
-		// 		// Found a column with a bunch of robots in it, so now we check to see how many are consecutive
-		// 		maxConsecutive := 0
-		// 		consecutive := 0
-		// 		for y := 0; y < maxY; y++ {
-		// 			if positions[Point{x, y}] > 0 {
-		// 				consecutive++
-		// 			} else {
-		// 				if consecutive > maxConsecutive {
-		// 					maxConsecutive = consecutive
-		// 				}
-		// 				consecutive = 0
-		// 			}
-		// 		}
-
-		// 		if maxConsecutive >= 30 {
-		// 			found = true
-		// 			iteration = i
-		// 			break
-		// 		}
-		// 	}
-		// }
-
-		// It turns out that all of the robots are in unique positions at the target iteration, so we can just check for that
-		unique := true
-		for _, count := range positions {
-			if count > 1 {
-				unique = false
-				break
-			}
+		for point := range positions {
+			columnCounts[point.x]++
 		}
 
-		if unique {
-			found = true
-			iteration = i
+		for x, count := range columnCounts {
+			if count >= 30 {
+				// Found a column with a bunch of robots in it, so now we check to see how many are consecutive
+				maxConsecutive := 0
+				consecutive := 0
+				for y := 0; y < maxY; y++ {
+					if positions[Point{x, y}] > 0 {
+						consecutive++
+					} else {
+						if consecutive > maxConsecutive {
+							maxConsecutive = consecutive
+						}
+						consecutive = 0
+					}
+				}
+
+				if maxConsecutive >= 30 {
+					found = true
+					iteration = i
+					break
+				}
+			}
 		}
 	}
 
-	fmt.Println("Part 2:", iteration)
+	fmt.Println("Part 2:", iteration, time.Since(begin))
 
 	if iteration > -1 {
 		for y := 0; y < maxY; y++ {
@@ -108,53 +100,45 @@ func main() {
 			fmt.Println()
 		}
 	}
-
 }
 
-func part1(robots []Robot) {
-	seconds := 100
-	maxX, maxY := 101, 103
-	halfX, halfY := maxX/2, maxY/2
-	quadCounts := [4]int{}
+func alternatePart2(robots []Robot, maxX, maxY int) {
+	begin := time.Now()
+	var positions map[Point]int
+	iteration := -1
 
-	// Part 1
-	for _, robot := range robots {
-		newpx, newpy := (robot.px+(robot.vx*seconds))%maxX, (robot.py+(robot.vy*seconds))%maxY
+	for i := 0; i < 10000; i++ {
+		positions = calcRobotPositions(robots, maxX, maxY, i)
 
-		if newpx < 0 {
-			newpx = maxX + newpx
-		}
-
-		if newpy < 0 {
-			newpy = maxY + newpy
-		}
-
-		// Determine quadrant - skip anything on the centre lines
-		if newpx != halfX && newpy != halfY {
-			if newpx < halfX {
-				if newpy < halfY {
-					quadCounts[0]++
-				} else {
-					quadCounts[1]++
-				}
-			} else {
-				if newpy < halfY {
-					quadCounts[2]++
-				} else {
-					quadCounts[3]++
-				}
+		// It turns out that all of the robots are in unique positions at the target iteration, so we can just check for that
+		unique := true
+		for _, count := range positions {
+			if count > 1 {
+				unique = false
+				break
 			}
 		}
+
+		if unique {
+			iteration = i
+			break
+		}
 	}
 
-	safetyFactor := 1
+	fmt.Println("Part 2:", iteration, time.Since(begin))
 
-	for i, count := range quadCounts {
-		fmt.Printf("Quadrant %d: %d\n", i, count)
-		safetyFactor *= count
+	if iteration > -1 {
+		for y := 0; y < maxY; y++ {
+			for x := 0; x < maxX; x++ {
+				if positions[Point{x, y}] > 0 {
+					fmt.Print("#")
+				} else {
+					fmt.Print(".")
+				}
+			}
+			fmt.Println()
+		}
 	}
-
-	fmt.Println("Safety factor:", safetyFactor)
 }
 
 func calcRobotPositions(robots []Robot, maxX, maxY int, seconds int) map[Point]int {
