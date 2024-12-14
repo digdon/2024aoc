@@ -48,35 +48,49 @@ func main() {
 	for found, i := false, 0; !found && i < 10000; i++ {
 		positions = calcRobotPositions(robots, maxX, maxY, i)
 
-		// Look for any column that has a bunch of robots in it
-		columnCounts := map[int]int{}
+		// // Look for any column that has a bunch of robots in it
+		// columnCounts := map[int]int{}
 
-		for point := range positions {
-			columnCounts[point.x]++
+		// for point := range positions {
+		// 	columnCounts[point.x]++
+		// }
+
+		// for x, count := range columnCounts {
+		// 	if count >= 30 {
+		// 		// Found a column with a bunch of robots in it, so now we check to see how many are consecutive
+		// 		maxConsecutive := 0
+		// 		consecutive := 0
+		// 		for y := 0; y < maxY; y++ {
+		// 			if positions[Point{x, y}] > 0 {
+		// 				consecutive++
+		// 			} else {
+		// 				if consecutive > maxConsecutive {
+		// 					maxConsecutive = consecutive
+		// 				}
+		// 				consecutive = 0
+		// 			}
+		// 		}
+
+		// 		if maxConsecutive >= 30 {
+		// 			found = true
+		// 			iteration = i
+		// 			break
+		// 		}
+		// 	}
+		// }
+
+		// It turns out that all of the robots are in unique positions at the target iteration, so we can just check for that
+		unique := true
+		for _, count := range positions {
+			if count > 1 {
+				unique = false
+				break
+			}
 		}
 
-		for x, count := range columnCounts {
-			if count >= 30 {
-				// Found a column with a bunch of robots in it, so now we check to see how many are consecutive
-				maxConsecutive := 0
-				consecutive := 0
-				for y := 0; y < maxY; y++ {
-					if positions[Point{x, y}] > 0 {
-						consecutive++
-					} else {
-						if consecutive > maxConsecutive {
-							maxConsecutive = consecutive
-						}
-						consecutive = 0
-					}
-				}
-
-				if maxConsecutive >= 30 {
-					found = true
-					iteration = i
-					break
-				}
-			}
+		if unique {
+			found = true
+			iteration = i
 		}
 	}
 

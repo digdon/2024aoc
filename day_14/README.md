@@ -11,3 +11,5 @@ Once I knew what the target looked like, I was able to refine my end conditions.
 1. check that column to see if there are 30 or more consecutive robots
 
 If both conditions are satisfied, we very likely found the iteration.
+
+Saw a comment on reddit that suggested that at the target iteration, each robot would be in a unique position. I tried this with my own result and can confirm that this is the case.
