@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"time"
 )
@@ -42,16 +43,17 @@ func main() {
 
 	fmt.Println("Part 1:", safetyFactor)
 
-	originalPart2(robots, maxX, maxY)
-	alternatePart2(robots, maxX, maxY)
+	part2_column(robots, maxX, maxY)
+	part2_unique(robots, maxX, maxY)
+	part2_safety(robots, maxX, maxY)
 }
 
-func originalPart2(robots []Robot, maxX, maxY int) {
+func part2_column(robots []Robot, maxX, maxY int) {
 	begin := time.Now()
 	var positions map[Point]int
 	iteration := -1
 
-	for found, i := false, 0; !found && i < 10000; i++ {
+	for found, i := false, 0; !found && i < maxX*maxY; i++ {
 		positions = calcRobotPositions(robots, maxX, maxY, i)
 
 		// Look for any column that has a bunch of robots in it
@@ -86,7 +88,7 @@ func originalPart2(robots []Robot, maxX, maxY int) {
 		}
 	}
 
-	fmt.Println("Part 2:", iteration, time.Since(begin))
+	fmt.Println("Part 2 - column:", iteration, time.Since(begin))
 
 	if iteration > -1 {
 		for y := 0; y < maxY; y++ {
@@ -102,12 +104,12 @@ func originalPart2(robots []Robot, maxX, maxY int) {
 	}
 }
 
-func alternatePart2(robots []Robot, maxX, maxY int) {
+func part2_unique(robots []Robot, maxX, maxY int) {
 	begin := time.Now()
 	var positions map[Point]int
 	iteration := -1
 
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < maxX*maxY; i++ {
 		positions = calcRobotPositions(robots, maxX, maxY, i)
 
 		// It turns out that all of the robots are in unique positions at the target iteration, so we can just check for that
@@ -125,7 +127,7 @@ func alternatePart2(robots []Robot, maxX, maxY int) {
 		}
 	}
 
-	fmt.Println("Part 2:", iteration, time.Since(begin))
+	fmt.Println("Part 2 - unique:", iteration, time.Since(begin))
 
 	if iteration > -1 {
 		for y := 0; y < maxY; y++ {
@@ -139,6 +141,30 @@ func alternatePart2(robots []Robot, maxX, maxY int) {
 			fmt.Println()
 		}
 	}
+}
+
+func part2_safety(robots []Robot, maxX, maxY int) {
+	begin := time.Now()
+	lowestSF := math.MaxInt
+	bestIteration := -1
+
+	for i := 0; i < maxX*maxY; i++ {
+		quadCounts := calcQuadrants(calcRobotPositions(robots, maxX, maxY, i), maxX, maxY)
+		safetyFactor := 1
+
+		for _, count := range quadCounts {
+			if count > 0 {
+				safetyFactor *= count
+			}
+		}
+
+		if safetyFactor < lowestSF {
+			lowestSF = safetyFactor
+			bestIteration = i
+		}
+	}
+
+	fmt.Println("Part 2 - safety:", bestIteration, time.Since(begin))
 }
 
 func calcRobotPositions(robots []Robot, maxX, maxY int, seconds int) map[Point]int {
