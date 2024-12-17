@@ -27,8 +27,8 @@ func Solve(inputLines []string) {
 		moves = append(moves, line)
 	}
 
-	fmt.Println(rx, ry)
-	fmt.Println(moves)
+	// fmt.Println(rx, ry)
+	// fmt.Println(moves)
 	grid[ry][rx] = '.'
 
 	// Start moving the robot
@@ -50,18 +50,9 @@ func Solve(inputLines []string) {
 				// Empty space, move the robot
 				rx, ry = nextX, nextY
 			}
-		}
-	}
 
-	for y := 0; y < len(grid); y++ {
-		for x := 0; x < len(grid[y]); x++ {
-			if x == rx && y == ry {
-				fmt.Printf("@")
-			} else {
-				fmt.Printf("%c", grid[y][x])
-			}
+			// displayGrid(grid, rx, ry, rune(moveline[0]))
 		}
-		fmt.Println()
 	}
 
 	var part1Sum int
@@ -75,6 +66,22 @@ func Solve(inputLines []string) {
 	}
 
 	fmt.Println("Part 1:", part1Sum)
+}
+
+func displayGrid(grid [][]byte, rx, ry int, move rune) {
+	fmt.Printf("Move %c:\n", move)
+
+	for y := 0; y < len(grid); y++ {
+		for x := 0; x < len(grid[y]); x++ {
+			if x == rx && y == ry {
+				fmt.Printf("@")
+			} else {
+				fmt.Printf("%c", grid[y][x])
+			}
+		}
+
+		fmt.Println()
+	}
 }
 
 func moveBox(grid [][]byte, bx, by int, dir [2]int) bool {

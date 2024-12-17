@@ -1,11 +1,11 @@
 package main
 
 import (
+	"2024aoc/part1"
+	"2024aoc/part2"
 	"bufio"
 	"log"
 	"os"
-	"whatever/part1"
-	"whatever/part2"
 )
 
 func main() {

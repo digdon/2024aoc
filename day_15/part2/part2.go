@@ -36,10 +36,6 @@ func Solve(inputLines []string) {
 		moves = append(moves, line)
 	}
 
-	fmt.Println(rx, ry)
-	// fmt.Println(moves)
-	// grid[ry][rx] = '.'
-
 	// Start moving the robot
 	for _, moveline := range moves {
 		for _, move := range moveline {
@@ -53,8 +49,10 @@ func Solve(inputLines []string) {
 			} else if ch == '[' || ch == ']' {
 				// Found a box - try to move it
 				if boxCanMove(grid, nextX, nextY, move) {
-					// Box can be moved, so move it and the robot
+					// Box can be moved, so move it
 					moveBox(grid, nextX, nextY, move)
+
+					// Move the robot
 					rx, ry = nextX, nextY
 				}
 			} else {
@@ -104,22 +102,10 @@ func boxCanMove(grid [][]byte, bx, by int, move rune) bool {
 		return true
 	}
 
-	canMove := false
-
-	// if move == '>' && grid[by][bx] == '[' {
 	if move == '>' {
-		canMove = boxCanMove(grid, bx+2, by, move)
-
-		if !canMove {
-			return false
-		}
-		// } else if move == '<' && grid[by][bx] == ']' {
+		return boxCanMove(grid, bx+2, by, move)
 	} else if move == '<' {
-		canMove = boxCanMove(grid, bx-2, by, move)
-
-		if !canMove {
-			return false
-		}
+		return boxCanMove(grid, bx-2, by, move)
 	} else {
 		var addY, leftX, rightX int
 
@@ -153,8 +139,8 @@ func moveBox(grid [][]byte, bx, by int, move rune) {
 			moveBox(grid, bx+2, by, move)
 		}
 
-		grid[by][bx+2] = ']'
 		grid[by][bx+1] = '['
+		grid[by][bx+2] = ']'
 		grid[by][bx] = '.'
 	} else if move == '<' {
 		if grid[by][bx-2] == ']' {
