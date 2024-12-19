@@ -38,7 +38,7 @@ func main() {
 		pathMap[p] = true
 	}
 
-	fmt.Println("Part 1:", len(path)-1, time.Since(begin))
+	fmt.Printf("Part 1: %d (%s)\n", len(path)-1, time.Since(begin))
 
 	begin = time.Now()
 	for i := firstChunk; i < len(inputLines); i++ {
@@ -55,7 +55,7 @@ func main() {
 		path := bfs(maxX, maxY, obstaclesMap)
 
 		if path == nil {
-			fmt.Printf("Part 2: %d,%d %s\n", oPoint.x, oPoint.y, time.Since(begin))
+			fmt.Printf("Part 2: %d,%d (%s)\n", oPoint.x, oPoint.y, time.Since(begin))
 			break
 		}
 
