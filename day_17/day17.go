@@ -53,6 +53,44 @@ func main() {
 	outputString := strings.Join(outputStrVals, ",")
 
 	fmt.Println("Part 1:", outputString)
+
+	// Part 2 stuff
+	result := solve(program, 0, 0, regB, regC)
+	fmt.Println("Part 2:", result)
+	output = runProgram(program, result, regB, regC)
+	fmt.Println(output)
+}
+
+func slicesEqual(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i, value := range a {
+		if value != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func solve(program []int, pos, regA, regB, regC int) int {
+	output := runProgram(program, regA, regB, regC)
+
+	if slicesEqual(output, program) {
+		return regA
+	}
+
+	if pos == 0 || slicesEqual(output, program[len(program)-pos:]) {
+		for ni := 0; ni < 8; ni++ {
+			if na := solve(program, pos+1, 8*regA+ni, regB, regC); na > 0 {
+				return na
+			}
+		}
+	}
+
+	return 0
 }
 
 func runProgram(program []int, regA, regB, regC int) []int {
@@ -116,4 +154,15 @@ func comboOperandValue(operand, regA, regB, regC int) int {
 	default:
 		return -1
 	}
+}
+
+var instMap = map[int]string{
+	0: "adv",
+	1: "bxl",
+	2: "bst",
+	3: "jnz",
+	4: "bxc",
+	5: "out",
+	6: "bdv",
+	7: "cdv",
 }
