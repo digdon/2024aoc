@@ -64,12 +64,12 @@ func calculateCheats(path []Point) (int, int) {
 			dist := diffX + diffY
 			saved := (j - i) - dist
 
-			if dist <= 2 && saved >= 100 {
-				part1Count++
-			}
-
 			if dist <= 20 && saved >= 100 {
 				part2Count++
+
+				if dist == 2 {
+					part1Count++
+				}
 			}
 		}
 	}
