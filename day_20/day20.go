@@ -37,48 +37,17 @@ func main() {
 	begin := time.Now()
 
 	path := bfs(grid, start, end)
-	pathMap := map[Point]int{}
+	fmt.Println("bfs done in", time.Since(begin))
 
-	for step, point := range path {
-		pathMap[point] = step
-	}
-
-	fmt.Printf("Part 1: %d (%s)\n", part1(grid, path, pathMap), time.Since(begin))
 	begin = time.Now()
-	fmt.Printf("Part 2: %d (%s)\n", part2(path), time.Since(begin))
+	part1, part2 := calculateCheats(path)
+	fmt.Println("Part 1:", part1)
+	fmt.Println("Part 2:", part2)
+	fmt.Println("Time:", time.Since(begin))
 }
 
-func part1(grid [][]rune, path []Point, pathMap map[Point]int) int {
-	cheatCount := 0
-
-	for step, point := range path {
-		for _, dir := range Directions {
-			oneX, oneY := point.x+dir.x, point.y+dir.y
-			twoX, twoY := point.x+2*dir.x, point.y+2*dir.y
-
-			if twoY < 0 || twoY >= len(grid) || twoX < 0 || twoX >= len(grid[twoY]) {
-				// end of cheat falls off the grid, so skip this direction
-				continue
-			}
-
-			if grid[oneY][oneX] == '#' && (grid[twoY][twoX] == '.' || grid[twoY][twoX] == 'E') {
-				if nextStep, ok := pathMap[Point{twoX, twoY}]; ok {
-					// Found a workable cheat
-					saved := (nextStep - step) - 2
-
-					if saved >= 100 {
-						cheatCount++
-					}
-				}
-			}
-		}
-	}
-
-	return cheatCount
-}
-
-func part2(path []Point) int {
-	cheatCount := 0
+func calculateCheats(path []Point) (int, int) {
+	part1Count, part2Count := 0, 0
 
 	for i, point := range path {
 		for j := i + 1; j < len(path); j++ {
@@ -91,22 +60,21 @@ func part2(path []Point) int {
 			if diffY < 0 {
 				diffY = -diffY
 			}
+
 			dist := diffX + diffY
-
-			if dist > 20 {
-				// Too far away, skip
-				continue
-			}
-
 			saved := (j - i) - dist
 
-			if saved >= 100 {
-				cheatCount++
+			if dist <= 2 && saved >= 100 {
+				part1Count++
+			}
+
+			if dist <= 20 && saved >= 100 {
+				part2Count++
 			}
 		}
 	}
 
-	return cheatCount
+	return part1Count, part2Count
 }
 
 func bfs(grid [][]rune, start, end Point) []Point {
