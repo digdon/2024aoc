@@ -30,7 +30,7 @@ func main() {
 	for _, line := range inputLines {
 		secret, _ := strconv.Atoi(line)
 		changes := []int{}
-		deltaMap := map[[4]int]bool{}
+		deltaSeenMap := map[[4]int]bool{}
 		prevPrice := secret % 10
 
 		for i := 0; i < 2000; i++ {
@@ -46,9 +46,9 @@ func main() {
 
 				deltas := [4]int{changes[0], changes[1], changes[2], changes[3]}
 
-				if !deltaMap[deltas] {
+				if !deltaSeenMap[deltas] {
 					deltaPriceMap[deltas] += price
-					deltaMap[deltas] = true
+					deltaSeenMap[deltas] = true
 				}
 			}
 
