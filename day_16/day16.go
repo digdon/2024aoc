@@ -6,27 +6,29 @@ import (
 	"log"
 	"math"
 	"os"
+	"sort"
+	"time"
 )
 
 func main() {
-	var grid [][]rune
+	grid := map[Point]bool{}
 	var start, end Point
 
 	scanner := bufio.NewScanner(os.Stdin)
 
-	for scanner.Scan() {
+	for y := 0; scanner.Scan(); y++ {
 		line := scanner.Text()
-		row := []rune{}
-		for i, c := range line {
-			row = append(row, c)
-
-			if c == 'S' {
-				start = Point{i, len(grid)}
-			} else if c == 'E' {
-				end = Point{i, len(grid)}
+		for x, ch := range line {
+			if ch == 'S' {
+				start = Point{x, y}
+				grid[Point{x, y}] = true
+			} else if ch == 'E' {
+				end = Point{x, y}
+				grid[Point{x, y}] = true
+			} else if ch == '.' {
+				grid[Point{x, y}] = true
 			}
 		}
-		grid = append(grid, row)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -34,67 +36,75 @@ func main() {
 		os.Exit(1)
 	}
 
+	begin := time.Now()
 	cost, paths := dijkstra(grid, start, end)
-	fmt.Println("Part 1:", cost)
+	pointSet := map[Point]bool{}
 	for _, path := range paths {
-		fmt.Println(path)
+		for k := range path {
+			pointSet[k] = true
+		}
 	}
+
+	fmt.Println("Part 1:", cost)
+	fmt.Println("Part 2:", len(pointSet))
+	fmt.Println("Time:", time.Since(begin))
 }
 
-func dijkstra(grid [][]rune, start, end Point) (int, [][]Point) {
-	totalCost := math.MaxInt
+func dijkstra(grid map[Point]bool, start, end Point) (int, []map[Point]bool) {
+	bestCost := math.MaxInt
+	var bestPaths []map[Point]bool
+	pointCosts := map[Key]int{}
+	queue := []Step{{start, 0, EAST, map[Point]bool{start: true}}}
 
-	// Initialize the distance/cost map
-	costMap := map[Point]int{start: 0}
-
-	// Initialize the queue
-	queue := []Step{{start, 0, EAST}}
-
-	// Start the algorithm
-	for len(queue) > 0 {
-		// Get the current point
+	for len(queue) > 0 && queue[0].cost <= bestCost {
 		curr := queue[0]
 		queue = queue[1:]
 
-		// Check if we have reached the end
 		if curr.point == end {
-			if curr.cost < totalCost {
-				fmt.Println("New path!", curr.cost)
-				totalCost = curr.cost
-			} else if curr.cost == totalCost {
-				fmt.Println("Matching path!", curr.cost)
+			if curr.cost < bestCost {
+				bestCost = curr.cost
+				bestPaths = []map[Point]bool{}
+			}
+
+			if curr.cost == bestCost {
+				fmt.Println("Found end!")
+				fmt.Println("Cost:", curr.cost)
+				// fmt.Println(curr.path)
+				bestPaths = append(bestPaths, curr.path)
 			}
 
 			continue
 		}
 
-		// Check neighbour elements
-		for label, dir := range Directions {
-			nx, ny := curr.point.x+dir[0], curr.point.y+dir[1]
+		for _, dir := range DirectionList {
+			nextPoint := Point{curr.point.x + Directions[dir][0], curr.point.y + Directions[dir][1]}
 
-			if grid[ny][nx] == '#' {
+			if !grid[nextPoint] {
 				continue
 			}
 
-			neighbour := Point{nx, ny}
-			rotateCost := rotateCosts[curr.dir][label] * 1000
-			altCost := curr.cost + rotateCost + 1
-			neighbourCost, ok := costMap[neighbour]
+			nextCost := curr.cost + (rotateCosts[curr.dir][dir] * 1000) + 1
 
-			if !ok {
-				neighbourCost = math.MaxInt
-			}
+			key := Key{nextPoint.x, nextPoint.y, int(dir)}
 
-			if altCost <= neighbourCost {
-				costMap[neighbour] = altCost
-				queue = append(queue, Step{neighbour, altCost, label})
+			if neighbourCost, ok := pointCosts[key]; !ok || nextCost <= neighbourCost {
+				pointCosts[key] = nextCost
+				nextPath := make(map[Point]bool, len(curr.path)+1)
+				for k := range curr.path {
+					nextPath[k] = true
+				}
+				nextPath[nextPoint] = true
+				queue = append(queue, Step{nextPoint, nextCost, dir, nextPath})
 			}
 		}
+
+		// Sort the queue by cost - by doing this, I make it a priority queue and I don't have to follow every active path
+		sort.Slice(queue, func(i, j int) bool {
+			return queue[i].cost < queue[j].cost
+		})
 	}
 
-	var successfulPaths [][]Point
-
-	return costMap[end], successfulPaths
+	return bestCost, bestPaths
 }
 
 type Dir int
@@ -105,6 +115,8 @@ const (
 	SOUTH
 	WEST
 )
+
+var DirectionList = []Dir{NORTH, EAST, SOUTH, WEST}
 
 var Directions = map[Dir][2]int{
 	NORTH: {0, -1},
@@ -120,10 +132,15 @@ var rotateCosts [][]int = [][]int{
 	{1, 2, 1, 0},
 }
 
+type Key struct {
+	x, y, dir int
+}
+
 type Step struct {
 	point Point
 	cost  int
 	dir   Dir
+	path  map[Point]bool
 }
 
 type Point struct {
