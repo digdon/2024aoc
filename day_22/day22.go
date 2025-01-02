@@ -46,6 +46,8 @@ func main() {
 
 				deltas := [4]int{changes[0], changes[1], changes[2], changes[3]}
 
+				// Only add the price if we haven't seen this delta before (this is because we're only to use the first
+				// occurrence of a delta)
 				if !deltaSeenMap[deltas] {
 					deltaPriceMap[deltas] += price
 					deltaSeenMap[deltas] = true
