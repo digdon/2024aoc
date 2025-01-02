@@ -2,9 +2,12 @@ package part2
 
 import (
 	"fmt"
+	"time"
 )
 
 func Solve(inputLines []string) {
+	begin := time.Now()
+
 	// Build the grid, find the robot start location, and build the movement list
 	grid := [][]byte{}
 	moves := []string{}
@@ -74,7 +77,7 @@ func Solve(inputLines []string) {
 		}
 	}
 
-	fmt.Println("Part 2:", part2Sum)
+	fmt.Printf("Part 2: %d (%s)\n", part2Sum, time.Since(begin))
 }
 
 func displayGrid(grid [][]byte, rx, ry int, move rune) {
@@ -151,78 +154,33 @@ func moveBox(grid [][]byte, bx, by int, move rune) {
 		grid[by][bx-2] = '['
 		grid[by][bx-1] = ']'
 		grid[by][bx] = '.'
-	} else if move == '^' {
-		if grid[by][bx] == '[' {
-			// Need to check for box over this point
-			if grid[by-1][bx] == '[' || grid[by-1][bx] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx, by-1, move)
-			}
-
-			// Need to check for box over the point on the right
-			if grid[by-1][bx+1] == '[' || grid[by-1][bx+1] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx+1, by-1, move)
-			}
-
-			grid[by-1][bx] = '['
-			grid[by-1][bx+1] = ']'
-			grid[by][bx] = '.'
-			grid[by][bx+1] = '.'
-		} else if grid[by][bx] == ']' {
-			// Need to check for box over this point
-			if grid[by-1][bx] == '[' || grid[by-1][bx] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx, by-1, move)
-			}
-
-			// Need to check for box over the point on the left
-			if grid[by-1][bx-1] == '[' || grid[by-1][bx-1] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx-1, by-1, move)
-			}
-
-			grid[by-1][bx-1] = '['
-			grid[by-1][bx] = ']'
-			grid[by][bx-1] = '.'
-			grid[by][bx] = '.'
-		}
 	} else {
-		if grid[by][bx] == '[' {
-			// Need to check for box below this point
-			if grid[by+1][bx] == '[' || grid[by+1][bx] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx, by+1, move)
-			}
+		var tempBy, leftBx, rightBx int
 
-			// Need to check for box below the point on the right
-			if grid[by+1][bx+1] == '[' || grid[by+1][bx+1] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx+1, by+1, move)
-			}
-
-			grid[by+1][bx] = '['
-			grid[by+1][bx+1] = ']'
-			grid[by][bx] = '.'
-			grid[by][bx+1] = '.'
-		} else if grid[by][bx] == ']' {
-			// Need to check for box below this point
-			if grid[by+1][bx] == '[' || grid[by+1][bx] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx, by+1, move)
-			}
-
-			// Need to check for box below the point on the left
-			if grid[by+1][bx-1] == '[' || grid[by+1][bx-1] == ']' {
-				// Another box is in the way, move it first
-				moveBox(grid, bx-1, by+1, move)
-			}
-
-			grid[by+1][bx-1] = '['
-			grid[by+1][bx] = ']'
-			grid[by][bx-1] = '.'
-			grid[by][bx] = '.'
+		if move == '^' {
+			tempBy = by - 1
+		} else {
+			tempBy = by + 1
 		}
+
+		if grid[by][bx] == '[' {
+			leftBx, rightBx = bx, bx+1
+		} else {
+			leftBx, rightBx = bx-1, bx
+		}
+
+		if grid[tempBy][leftBx] == '[' || grid[tempBy][leftBx] == ']' {
+			moveBox(grid, leftBx, tempBy, move)
+		}
+
+		if grid[tempBy][rightBx] == '[' || grid[tempBy][rightBx] == ']' {
+			moveBox(grid, rightBx, tempBy, move)
+		}
+
+		grid[tempBy][leftBx] = '['
+		grid[tempBy][rightBx] = ']'
+		grid[by][leftBx] = '.'
+		grid[by][rightBx] = '.'
 	}
 }
 

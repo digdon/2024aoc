@@ -3,9 +3,12 @@ package part1
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 func Solve(inputLines []string) {
+	begin := time.Now()
+
 	// Build the grid, find the robot start location, and build the movement list
 	grid := [][]byte{}
 	moves := []string{}
@@ -65,7 +68,7 @@ func Solve(inputLines []string) {
 		}
 	}
 
-	fmt.Println("Part 1:", part1Sum)
+	fmt.Printf("Part 1: %d (%s)\n", part1Sum, time.Since(begin))
 }
 
 func displayGrid(grid [][]byte, rx, ry int, move rune) {
