@@ -53,7 +53,16 @@ func main() {
 
 	// Part 2
 	begin = time.Now()
-	fmt.Printf("Part 2: %s (%s)\n", strings.Join(part2(connectionsMap), ","), time.Since(begin))
+	result := part2(connectionsMap, nil)
+	fmt.Printf("Part 2: %s (%s)\n", strings.Join(result, ","), time.Since(begin))
+
+	begin = time.Now()
+	result = part2(connectionsMap, chooseDegreePivot)
+	fmt.Printf("Part 2: %s (%s)\n", strings.Join(result, ","), time.Since(begin))
+
+	begin = time.Now()
+	result = part2(connectionsMap, chooseGreedyPivot)
+	fmt.Printf("Part 2: %s (%s)\n", strings.Join(result, ","), time.Since(begin))
 }
 
 func part1(connectionsMap map[string]map[string]bool) int {
@@ -95,7 +104,8 @@ func part1(connectionsMap map[string]map[string]bool) int {
 	return tCount
 }
 
-func part2(connectionsMap map[string]map[string]bool) []string {
+func part2(connectionsMap map[string]map[string]bool,
+	pfp func(p, x map[string]bool, graph map[string]map[string]bool) string) []string {
 	// Prep B-K maps
 	r := map[string]bool{}
 	p := map[string]bool{}
@@ -106,7 +116,7 @@ func part2(connectionsMap map[string]map[string]bool) []string {
 	}
 
 	var cliques [][]string
-	bronKerbosch(connectionsMap, r, p, x, &cliques)
+	bronKerbosch(connectionsMap, r, p, x, &cliques, pfp)
 
 	var largestClique []string
 	for _, clique := range cliques {
@@ -120,7 +130,10 @@ func part2(connectionsMap map[string]map[string]bool) []string {
 	return largestClique
 }
 
-func bronKerbosch(connectionsMap map[string]map[string]bool, r, p, x map[string]bool, cliques *[][]string) {
+func bronKerbosch(connectionsMap map[string]map[string]bool,
+	r, p, x map[string]bool,
+	cliques *[][]string,
+	pfp func(p, x map[string]bool, graph map[string]map[string]bool) string) {
 	if len(p) == 0 && len(x) == 0 {
 		clique := make([]string, 0, len(r))
 		for node := range r {
@@ -130,17 +143,57 @@ func bronKerbosch(connectionsMap map[string]map[string]bool, r, p, x map[string]
 		return
 	}
 
-	for v := range p {
+	// Generate P, based on whether a pivot function is provided
+	var diffSet map[string]bool
+	if pfp != nil {
+		pivot := pfp(p, x, connectionsMap)
+		diffSet = difference(p, connectionsMap[pivot])
+	} else {
+		diffSet = p
+	}
+
+	for v := range diffSet {
 		newR := copySet(r)
 		newR[v] = true
 		newP := intersect(p, connectionsMap[v])
 		newX := intersect(x, connectionsMap[v])
 
-		bronKerbosch(connectionsMap, newR, newP, newX, cliques)
+		bronKerbosch(connectionsMap, newR, newP, newX, cliques, pfp)
 
 		delete(p, v)
 		x[v] = true
 	}
+}
+
+func chooseDegreePivot(p, x map[string]bool, graph map[string]map[string]bool) string {
+	var pivot string
+	maxDegree := -1
+
+	for node := range union(p, x) {
+		degree := len(graph[node])
+		if degree > maxDegree {
+			maxDegree = degree
+			pivot = node
+		}
+	}
+
+	return pivot
+}
+
+func chooseGreedyPivot(p, x map[string]bool, graph map[string]map[string]bool) string {
+	var pivot string
+	maxOverlap := -1
+
+	for node := range p {
+		overlap := len(intersect(p, graph[node]))
+
+		if overlap > maxOverlap {
+			maxOverlap = overlap
+			pivot = node
+		}
+	}
+
+	return pivot
 }
 
 func copySet(s map[string]bool) map[string]bool {
@@ -151,10 +204,31 @@ func copySet(s map[string]bool) map[string]bool {
 	return c
 }
 
+func union(a, b map[string]bool) map[string]bool {
+	c := map[string]bool{}
+	for k := range a {
+		c[k] = true
+	}
+	for k := range b {
+		c[k] = true
+	}
+	return c
+}
+
 func intersect(a, b map[string]bool) map[string]bool {
 	c := map[string]bool{}
 	for k := range a {
 		if b[k] {
+			c[k] = true
+		}
+	}
+	return c
+}
+
+func difference(a, b map[string]bool) map[string]bool {
+	c := map[string]bool{}
+	for k := range a {
+		if !b[k] {
 			c[k] = true
 		}
 	}
