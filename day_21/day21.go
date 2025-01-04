@@ -91,29 +91,15 @@ func countDirChars(path string, dirPadMoves map[Move]string, cache map[Key]int, 
 	total := 0
 
 	moveSets := strings.Split(path, "A")
-	// fmt.Println("Move sets:", moveSets)
+
 	for move := 0; move < len(moveSets)-1; move++ {
-		moves := moveSets[move]
+		moves := "A" + moveSets[move] + "A"
 		sb := strings.Builder{}
-		for i := 0; i <= len(moves); i++ {
-			var start, end byte
-			if i == 0 {
-				start = 'A'
-			} else {
-				start = moves[i-1]
-			}
-
-			if i == len(moves) {
-				end = 'A'
-			} else {
-				end = moves[i]
-			}
-
-			sb.WriteString(dirPadMoves[Move{start, end}])
+		for i := 1; i < len(moves); i++ {
+			sb.WriteString(dirPadMoves[Move{moves[i-1], moves[i]}])
 			sb.WriteString("A")
 		}
 
-		// fmt.Println(sb.String())
 		total += countDirChars(sb.String(), dirPadMoves, cache, depth-1)
 	}
 
