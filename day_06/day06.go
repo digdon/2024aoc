@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -36,17 +37,15 @@ func main() {
 	}
 
 	// Part 1
+	begin := time.Now()
 	visited := part1Locations(inputLines, startX, startY, startDir)
-	fmt.Println("Part 1:", len(visited))
+	fmt.Printf("Part 1: %d (%s)\n", len(visited), time.Since(begin))
 
 	// Part 2
+	begin = time.Now()
 	delete(visited, Point{startX, startY}) // We remove this because we won't try adding an obstacle at the starting point
-	path := []Point{}
-	for point := range visited {
-		path = append(path, point)
-	}
-	count := part2(inputLines, startX, startY, startDir, path)
-	fmt.Println("Part 2:", count)
+	count := part2(inputLines, startX, startY, startDir, visited)
+	fmt.Printf("Part 2: %d (%s)\n", count, time.Since(begin))
 }
 
 func part1Locations(grid [][]byte, x, y, dir int) map[Point]bool {
@@ -71,13 +70,13 @@ func part1Locations(grid [][]byte, x, y, dir int) map[Point]bool {
 	return visited
 }
 
-func part2(grid [][]byte, startX, startY, startDir int, possible []Point) int {
+func part2(grid [][]byte, startX, startY, startDir int, possible map[Point]bool) int {
 	var count int
 
 	// For every point the guard originally reached, add an obstacle and see if we can get the guard to form a loop.
 	// We already know that the guard can only reach these particular points if there are no obstacles, so that means
 	// we only need to try putting obstacles along this path.
-	for _, point := range possible {
+	for point := range possible {
 		// Set an obstacle at the next point
 		grid[point.y][point.x] = '#'
 
