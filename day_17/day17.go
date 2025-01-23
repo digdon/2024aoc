@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -45,6 +45,7 @@ func main() {
 		}
 	}
 
+	begin := time.Now()
 	output := runProgram(program, regA, regB, regC)
 	outputStrVals := []string{}
 	for _, value := range output {
@@ -52,11 +53,12 @@ func main() {
 	}
 	outputString := strings.Join(outputStrVals, ",")
 
-	fmt.Println("Part 1:", outputString)
+	fmt.Printf("Part 1: %s (%s)\n", outputString, time.Since(begin))
 
 	// Part 2 stuff
+	begin = time.Now()
 	result := solve(program, 0, 0, regB, regC)
-	fmt.Println("Part 2:", result)
+	fmt.Printf("Part 2: %d (%s)\n", result, time.Since(begin))
 	output = runProgram(program, result, regB, regC)
 	fmt.Println(output)
 }
@@ -106,8 +108,7 @@ func runProgram(program []int, regA, regB, regC int) []int {
 		switch instruction {
 		case 0: // adv
 			num := regA
-			div := int(math.Pow(float64(2), float64(comboOperandValue(operand, regA, regB, regC))))
-			regA = num / div
+			regA = num >> comboOperandValue(operand, regA, regB, regC)
 
 		case 1: // bxl
 			regB ^= operand
@@ -128,13 +129,11 @@ func runProgram(program []int, regA, regB, regC int) []int {
 
 		case 6: // bdv
 			num := regA
-			div := int(math.Pow(float64(2), float64(comboOperandValue(operand, regA, regB, regC))))
-			regB = num / div
+			regB = num >> comboOperandValue(operand, regA, regB, regC)
 
 		case 7: // cdv
 			num := regA
-			div := int(math.Pow(float64(2), float64(comboOperandValue(operand, regA, regB, regC))))
-			regC = num / div
+			regC = num >> comboOperandValue(operand, regA, regB, regC)
 		}
 	}
 
